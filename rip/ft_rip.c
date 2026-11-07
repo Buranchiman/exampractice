@@ -36,30 +36,50 @@ void	build_base(char *src, char *dest)
         }
 }
 
-int	moves_needed(char *s)
+/*int	moves_needed(char *s)
 {
 	int	i = 0;
-	int	open_count = 0;
-	int	close_count = 0;
-	int	absolute;
+	int	count = 0;
+	//int	close_count = 0;
+	//int	absolute;
+	int	opened = 0;
 
 	while (s[i])
 	{
-		if (s[i] == '(')
-			open_count++;
-		if (s[i] == ')')
-			close_count ++;
+		if (s[i] == '(' && !opened)
+			opened = 1;
+		else if (s[i] == '(' && opened)
+			count++;
+		if (s[i] == ')' && opened)
+			opened = 0;
+		else if (s[i] == ')' && !opened)
+			count ++;
 		i++;
 	}
-	absolute = open_count - close_count;
-	if (absolute < 0)
-		absolute = -absolute;
-	 return (absolute);
+	//absolute = open_count - close_count;
+	//if (absolute < 0)
+	//	absolute = -absolute;
+	 return (count);
+}*/
+
+void count_min_removals(const char *str, int *left_rem, int *right_rem) {
+    *left_rem = 0;
+    *right_rem = 0;
+    for (int i = 0; str[i]; i++) {
+        if (str[i] == '(') {
+            (*left_rem)++;
+        } else if (str[i] == ')') {
+            if (*left_rem > 0)
+                (*left_rem)--;
+            else
+                (*right_rem)++;
+        }
+    }
 }
 
-void	ft_rip_it(char *og, char *dup, int index, int curr, int max, int open)
+void	ft_rip_it(char *og, char *dup, int index, int left_rem, int right_rem , int open)
 {
-	if (!dup[index] && curr == max && !open)
+	if (!dup[index] && !left_rem && !right_rem && !open)
 	{
 		printf("%s\n", dup);
 		return ;
@@ -67,24 +87,24 @@ void	ft_rip_it(char *og, char *dup, int index, int curr, int max, int open)
 	if (og[index] == ' ')
 	{
 		dup[index] = ' ';
-		ft_rip_it(og, dup, index + 1, curr, max, open);
+		ft_rip_it(og, dup, index + 1, left_rem, right_rem, open);
 	}
 	else if (og[index] == '(')
 	{
 		dup[index] = '(';
-		ft_rip_it(og, dup, index + 1, curr, max, open + 1);
+		ft_rip_it(og, dup, index + 1, left_rem, right_rem, open + 1);
 		dup[index] = ' ';
-		ft_rip_it(og, dup, index + 1, curr + 1, max, open);
+		ft_rip_it(og, dup, index + 1, left_rem - 1, right_rem, open);
 	}
 	else if (og[index] == ')')
 	{
 		if (open)
 		{
 			dup[index] = ')';
-                	ft_rip_it(og, dup, index + 1, curr, max, open -1);
+                	ft_rip_it(og, dup, index + 1, left_rem, right_rem, open -1);
 		}
 		dup[index] = ' ';
-                ft_rip_it(og, dup, index + 1, curr + 1, max, open);
+                ft_rip_it(og, dup, index + 1, left_rem, right_rem - 1, open);
 	}
 	return ;
 }
@@ -107,8 +127,10 @@ int	main(int arc, char **arv)
 	}
 	build_base(arv[1], s);
 	//build_base(arv[1], dup);
-	int	moves = moves_needed(s);
+	int	left_rem = 0;
+       	int	right_rem = 0;
+	count_min_removals(s, &left_rem, &right_rem);
 	//printf("after clean is %sand needs %d moves to be solved\n", s, moves);
-	ft_rip_it(s, dup, 0, 0, moves, 0);
+	ft_rip_it(s, dup, 0, left_rem, right_rem, 0);
 	return (0);
 }
