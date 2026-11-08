@@ -15,5 +15,9 @@ typedef struct s_map
     char **grid;
 }   t_map;
 
+bool solve(t_map *map);
+bool parse_map(FILE *file, t_map *m);
+void    free_map(t_map *m);
+void print_map(t_map *map);
 
 #endif

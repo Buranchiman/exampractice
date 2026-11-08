@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include "bsq.h"
 
-void process(FILE *file)
+int process(FILE *file)
 {
    t_map map;
 
-   if (!file || parse_map(file, &map))
-      fputs("map error\n", stderr);
-   if (!solve_map(map))
-      fputs("map error\n", stderr);
-   return ;
+   if (!file || !parse_map(file, &map))
+      return (fputs("map error\n", stderr));
+   if (!solve(&map))
+      return (fputs("map error\n", stderr));
+	else
+		print_map(&map);
+	free_map(&map);
+   return (0);
 }
 
-int main(int arc, char *arv)
+int main(int arc, char **arv)
 {
 
    if (arc < 2)
